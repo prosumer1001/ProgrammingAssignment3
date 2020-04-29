@@ -1,7 +1,6 @@
 # Load some important functions and packages
 ## Set it up the script
-## user prosumer1001
-## pswd cevnew-4mekWi-qojtub
+
 if(T){  ## Set it up the script
         ## Create a function to clear the console easily
         clear <- function(x){
