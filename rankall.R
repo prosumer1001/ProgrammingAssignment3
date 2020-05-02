@@ -78,9 +78,12 @@ rankall <- function(outcome, num = "best"){
         rankHospital <- outcome_df %>%
                 filter(!is.na(deathCause)) %>%
                 filter(deathCause == outcome) %>%
-                arrange(deathRate, State, deathCause, Hospital) %>%
-                select(State,Hospital, State)
+                arrange(deathRate, State, Hospital) %>%
+                select(Hospital, State)
         
+        
+        
+## Return a data frame with the hospital names and the 
         if(num == "best"){
                 print(rankHospital)
         } else if(num == "worst"){
@@ -88,10 +91,6 @@ rankall <- function(outcome, num = "best"){
         } else if(num >= 0){
                 slice(rankHospital, num)
         }
-        
-
-## Return a data frame with the hospital names and the 
-        
 ## (abbreviated) state name.
 }
 
