@@ -49,6 +49,11 @@ if(T){  ## Set it up the script
                         return(FALSE)
                 }
         }
+        
+        globalClear <- function(x){
+                rm(list=ls()[! ls() %in% c("clear", "helpCon")])
+        }
+        
 } ## Set it up the script
 
 
@@ -60,43 +65,33 @@ rankall <- function(outcome, num = "best"){
 ## Read outcome data
         outcome_df <- import("~/Desktop/outcome.RData")
         ## str(outcome_df)
-
-## Check state and outcome are valid
-        checkState <- if(state %in% outcome_df$State){
-                as_tibble(outcome_df) %>%
-                        filter(State == state)
-        } else{
-                stop("invalid state")
-        }
         
+## Check that outcome is valid
         checkCause <- if(outcome %in% outcome_df$deathCause){
                 as_tibble(outcome_df) %>%
-                        filter(deathCause == outcome) %>%
-                        filter(!is.na(deathRate)) %>%
-                        filter(State == state) %>%
-                        arrange(deathRate, State, Hospital) %>%
-                        select(Hospital)
+                        filter(deathCause == outcome)
         } else{
                 stop("invalid cause")
         }
 
 ## For each state, find the hospital of the given rank
         rankHospital <- outcome_df %>%
-                filter(State == state) %>%
+                filter(!is.na(deathCause)) %>%
                 filter(deathCause == outcome) %>%
                 arrange(deathRate, State, deathCause, Hospital) %>%
-                select(Hospital, State)
+                select(State,Hospital, State)
         
         if(num == "best"){
-                head(rankHospital, 1)
+                print(rankHospital)
         } else if(num == "worst"){
-                tail(rankHospital, 1)
+                print(rankHospital)
         } else if(num >= 0){
                 slice(rankHospital, num)
         }
         
 
 ## Return a data frame with the hospital names and the 
+        
 ## (abbreviated) state name.
 }
 
@@ -107,6 +102,9 @@ rankall <- function(outcome, num = "best"){
 
 ##### WHITE BOARD #####
 
-rankall("heart attack", 15)
+head(rankall("heart attack", 20), 10)
+
 
 ##### END WHITE BOARD #####
+
+globalClear()
