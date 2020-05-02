@@ -20,7 +20,7 @@ rankState <- outcome_df %>%
         filter(deathCause == outcome) %>% # Include only outcome
         group_by(State) %>% # Group each by the State
         mutate(rank = row_number(deathRate)) %>% # generate a ranking variable
-        #filter(rank == num)%>% # filter by choosing the rank number
+        filter(rank == num)%>% # filter by choosing the rank number
         select(Hospital, State, deathCause, deathRate, rank)
 
 str(rankState)
