@@ -1,4 +1,4 @@
-## rankhospital.R
+## rankall.R
 ## Load some important functions and packages
 ## Set it up the script
 
@@ -56,45 +56,49 @@ if(T){  ## Set it up the script
 ###                    ###
 ### FUNCTION LOOK DOWN ###
 
-rankhospital <- function(state, outcome, num = "best"){
-## Read outcome data and reshape
-outcome_df <- import("~/Desktop/outcome.RData")
-## str(outcome_df)
+rankall <- function(outcome, num = "best"){
+## Read outcome data
+        outcome_df <- import("~/Desktop/outcome.RData")
+        ## str(outcome_df)
 
-checkState <- if(state %in% outcome_df$State){
-        as_tibble(outcome_df) %>%
-                filter(State == state)
-} else{
-        stop("invalid state")
-}
+## Check state and outcome are valid
+        checkState <- if(state %in% outcome_df$State){
+                as_tibble(outcome_df) %>%
+                        filter(State == state)
+        } else{
+                stop("invalid state")
+        }
+        
+        checkCause <- if(outcome %in% outcome_df$deathCause){
+                as_tibble(outcome_df) %>%
+                        filter(deathCause == outcome) %>%
+                        filter(!is.na(deathRate)) %>%
+                        filter(State == state) %>%
+                        arrange(deathRate, State, Hospital) %>%
+                        select(Hospital)
+        } else{
+                stop("invalid cause")
+        }
 
-checkCause <- if(outcome %in% outcome_df$deathCause){
-        as_tibble(outcome_df) %>%
-                filter(deathCause == outcome) %>%
-                filter(!is.na(deathRate)) %>%
+## For each state, find the hospital of the given rank
+        rankHospital <- outcome_df %>%
                 filter(State == state) %>%
-                arrange(deathRate, State, Hospital) %>%
-                select(Hospital)
-} else{
-        stop("invalid cause")
+                filter(deathCause == outcome) %>%
+                arrange(deathRate, State, deathCause, Hospital) %>%
+                select(Hospital, State)
+        
+        if(num == "best"){
+                head(rankHospital, 1)
+        } else if(num == "worst"){
+                tail(rankHospital, 1)
+        } else if(num >= 0){
+                slice(rankHospital, num)
+        }
+        
+
+## Return a data frame with the hospital names and the 
+## (abbreviated) state name.
 }
-
-rankHospital <- outcome_df %>%
-        filter(!is.na(deathRate)) %>%
-        filter(State == state) %>%
-        filter(deathCause == outcome) %>%
-        arrange(deathRate, State, deathCause, Hospital) %>%
-        select(Hospital)
-
-if(num == "best"){
-        head(rankHospital, 1)
-} else if(num == "worst"){
-        tail(rankHospital, 1)
-} else if(num >= 0){
-        slice(rankHospital, num)
-}      
-
-} ## Function END
 
 ### FUNCTION LOOK ^UP^ ###
 ###                    ###
@@ -103,34 +107,6 @@ if(num == "best"){
 
 ##### WHITE BOARD #####
 
-rankhospital("MN", "heart attack", 15)
+rankall("heart attack", 15)
 
 ##### END WHITE BOARD #####
-
-
-##### SOME GOOD DESCRIPTIVE STATS CODE #####
-## If You need NA count of all
-table(is.na(outcome)) 
-
-## If you need NA count Column wise 
-sapply(outcome, function(outcome) sum(is.na(outcome))) 
-
-## If you need NA count Row wise
-rowSums(is.na(outcome))
-
-##### END GOOD DS CODE #####
-
-## Clean up the working environment
-## # WIPE GLOBAL ENVIRONMENT
-# rm(list = ls())  # DO NOT USE UNLESS YOU WANT TO WIPE THE GLOBAL ENVIRONMENT
-
-## Keep unique functions defined in this script
-rm(list=setdiff(ls(), c("clear", "is.sorted", "packages", "helpCon")))
-rm(list = ls())
-## Clear the Console
-clear()
-
-
-
-
-

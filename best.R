@@ -1,4 +1,5 @@
-# Load some important functions and packages
+## best.R
+## Load some important functions and packages
 ## Set it up the script
 if(T){  ## Set it up the script
 ## Create a function to clear the console easily
@@ -52,7 +53,7 @@ is.sorted <- function(x = NULL) {
 setwd('~/Documents/gitrepos/DataAnalysis/RProgramming_Projects/ProgrammingAssignment3/')
 
 outcome_df <- import("./data/raw/outcome-of-care-measures.csv", colClasses = "character")
-
+export(outcome_df, file = "~/Desktop/outcome.RData")
 list.of.packages <- c("here", "rio", "dplyr", "tidyr", "janitor")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[, "Package"])]
 if(length(new.packages)) install.packages(new.packages)
@@ -125,7 +126,7 @@ best <- function(state = as.character(), outcome = as.character()) {
     outcome_df$deathCause <- recode(outcome_df$deathCause, 
                                     !!!level_key, 
                                     .default = NA_character_)
-    outcome_df <- as.list(outcome_df)
+    outcome_df <- as_tibble(outcome_df)
     
     #str(outcome_df)
     
