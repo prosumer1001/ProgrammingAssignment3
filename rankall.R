@@ -55,7 +55,11 @@ if(T){  ## Set it up the script
         }
         
 } ## Set it up the script
-
+outcome_df <- import("~/Documents/gitrepos/DataAnalysis/RProgramming_Projects/ProgrammingAssignment3/outcome.RData")
+outcome_df <- outcome_df %>% select(-City)
+outcome_df$State <- outcome_df$State
+outcome = "heart attack"
+num = 20
 
 ### FUNCTION LOOK DOWN ###
 ###                    ###
@@ -63,7 +67,9 @@ if(T){  ## Set it up the script
 
 rankall <- function(outcome, num = "best"){
 ## Read outcome data
-        outcome_df <- import("~/Desktop/outcome.RData")
+        outcome_df <- import("~/Documents/gitrepos/DataAnalysis/RProgramming_Projects/ProgrammingAssignment3/outcome.RData")
+        outcome_df <- outcome_df %>% select(-City)
+        outcome_df$State <- outcome_df$State
         ## str(outcome_df)
         
 ## Check that outcome is valid
@@ -76,12 +82,12 @@ rankall <- function(outcome, num = "best"){
 
 ## For each state, find the hospital of the given rank
         rankHospital <- outcome_df %>%
-                filter(!is.na(deathCause)) %>%
-                filter(deathCause == outcome) %>%
-                arrange(deathRate, State, Hospital) %>%
-                select(Hospital, State)
-        
-        
+                filter(deathCause == outcome) %>% # Filter only Outcome call
+                filter(!is.na(deathRate)) %>% # Filter remove NAs from deathRate
+                group_by(State) %>% # Group each by the State
+                mutate(rank = row_number(deathRate)) %>% # generate a ranking variable
+                filter(rank == num)%>% # filter by choosing the rank number
+                select(Hospital, State); rankHospital
         
 ## Return a data frame with the hospital names and the 
         if(num == "best"){
@@ -101,7 +107,7 @@ rankall <- function(outcome, num = "best"){
 
 ##### WHITE BOARD #####
 
-head(rankall("heart attack", 20), 10)
+rankall("heart attack", 20)
 
 
 ##### END WHITE BOARD #####
